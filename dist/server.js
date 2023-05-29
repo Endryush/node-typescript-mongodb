@@ -3,13 +3,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const dotenv_1 = __importDefault(require("dotenv"));
-exports.default = dotenv_1.default.config();
+require("./config/dotEnvGlobal");
 const index_1 = __importDefault(require("./routes/index"));
+const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const dbConnect_1 = __importDefault(require("./config/dbConnect"));
+const allowedOrigins_1 = __importDefault(require("./config/allowedOrigins"));
 const port = process.env.PORT || 3000;
 const app = (0, express_1.default)();
+app.use((0, cors_1.default)({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins_1.default.includes(origin)) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error('Access denied by CORS policy'));
+        }
+    },
+}));
 app.use(express_1.default.json());
 (0, index_1.default)(app);
 app.listen(port, () => {

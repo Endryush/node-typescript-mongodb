@@ -1,14 +1,25 @@
-import dotenv from "dotenv";
-export default dotenv.config();
-
+import "./config/dotEnvGlobal";
 import routes from "./routes/index";
-import express  from "express";
+import cors from 'cors';
+import express, { Request, Response, NextFunction } from 'express';
 import db from "./config/dbConnect"
+import allowedOrigins from "./config/allowedOrigins";
+import CorsCallback from "interfaces/ICors";
 
-
-const port = process.env.PORT || 3000
-
+const port: string | number = process.env.PORT || 3000
 const app = express()
+
+app.use(
+  cors({
+    origin: (origin: string | undefined, callback: CorsCallback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Access denied by CORS policy'));
+      }
+    },
+  })
+)
 
 app.use(express.json())
 
